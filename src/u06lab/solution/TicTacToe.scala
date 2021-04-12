@@ -20,10 +20,16 @@ object TicTacToe {
   }
   def placeAnyMark(board: Board, player: Player): Seq[Board] = {
     for {x <- 0 to 2; y <- 0 to 2
-         if !board.map(m => (m.x, m.y)).contains((x,y))} yield board.appended(Mark(x, y, player))
+         if find(board, x, y).isEmpty} yield board.appended(Mark(x, y, player))
   }
 
-  def computeAnyGame(player: Player, moves: Int): LazyList[Game] = ???
+  /*def computeAnyGame(player: Player, moves: Int): LazyList[Game] = moves match {
+    case 0 => LazyList.empty
+    case _ => for {
+      actualGames <- computeAnyGame(player.other, moves - 1)
+
+    }
+  }*/
 
   def printBoards(game: Seq[Board]): Unit =
     for (y <- 0 to 2; board <- game.reverse; x <- 0 to 2) {
@@ -48,7 +54,7 @@ object TicTacToe {
   //..X ... ... .X. ... ... X.. ...
 
   // Exercise 3 (ADVANCED!): implement computeAnyGame such that..
-  computeAnyGame(O, 4) foreach {g => printBoards(g); println()}
+  //computeAnyGame(O, 4) foreach {g => printBoards(g); println()}
   //... X.. X.. X.. XO.
   //... ... O.. O.. O..
   //... ... ... X.. X..
