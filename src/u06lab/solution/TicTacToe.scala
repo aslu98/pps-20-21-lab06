@@ -1,6 +1,6 @@
 package u06lab.solution
 
-import u06lab.solution.TicTacToe.{Mark, O, X, find, placeAnyMark, printBoards}
+import u06lab.solution.TicTacToe.{Mark, O, X, computeAnyGame, find, placeAnyMark, printBoards}
 
 object TicTacToe {
   sealed trait Player{
@@ -23,19 +23,19 @@ object TicTacToe {
          if find(board, x, y).isEmpty} yield board.appended(Mark(x, y, player))
   }
 
-  /*def computeAnyGame(player: Player, moves: Int): LazyList[Game] = moves match {
-    case 0 => LazyList.empty
-    case _ => for {
-      actualGames <- computeAnyGame(player.other, moves - 1)
+  def computeAnyGame(player: Player, moves: Int): LazyList[Game] = moves match {
+    case 0 => LazyList(placeAnyMark(List(),player).toList)
+    case _ => computeAnyGame(player.other, moves - 1).flatMap(_.toList).map(b => placeAnyMark(b, player).toList)
+  }
 
-    }
-  }*/
 
-  def printBoards(game: Seq[Board]): Unit =
+  def printBoards(game: Seq[Board]): Unit = {
+    var count = 1;
     for (y <- 0 to 2; board <- game.reverse; x <- 0 to 2) {
       print(find(board, x, y) map (_.toString) getOrElse ("."))
       if (x == 2) { print(" "); if (board == game.head) println()}
     }
+  }
 
   // Exercise 1: implement find such that..
   println(find(List(Mark(0,0,X)),0,0)) // Some(X)
@@ -54,7 +54,7 @@ object TicTacToe {
   //..X ... ... .X. ... ... X.. ...
 
   // Exercise 3 (ADVANCED!): implement computeAnyGame such that..
-  //computeAnyGame(O, 4) foreach {g => printBoards(g); println()}
+  (computeAnyGame(O, 4).zipWithIndex) foreach {g => printBoards(g._1); println(g._2)}
   //... X.. X.. X.. XO.
   //... ... O.. O.. O..
   //... ... ... X.. X..
@@ -68,19 +68,5 @@ object TicTacToe {
 }
 
 object Test extends App {
-  // Exercise 1: implement find such that..
-  println(find(List(Mark(0,0,X)),0,0)) // Some(X)
-  println(find(List(Mark(0,0,X),Mark(0,1,O),Mark(0,2,X)),0,1)) // Some(O)
-  println(find(List(Mark(0,0,X),Mark(0,1,O),Mark(0,2,X)),1,1)) // None
-
-  // Exercise 2: implement placeAnyMark such that..
-  printBoards(placeAnyMark(List(),X))
-  // -> Seq(Mark(0,0,X), Mark(0,1,X), Mark(0,2,X),...)
-  //... ... ..X ... ... .X. ... ... X..
-  //... ..X ... ... .X. ... ... X.. ...
-  //..X ... ... .X. ... ... X.. ... ...
-  printBoards(placeAnyMark(List(Mark(0,0,O)),X))
-  //O.. O.. O.X O.. O.. OX. O.. O..
-  //... ..X ... ... .X. ... ... X..
-  //..X ... ... .X. ... ... X.. ...
+  computeAnyGame(O, 4).zipWithIndex foreach {g => println("sol " + g._2); printBoards(g._1); println()}
 }
