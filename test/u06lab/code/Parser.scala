@@ -2,6 +2,7 @@ package u06lab.code
 
 import org.junit.jupiter.api.{Assertions, Test}
 import Assertions._
+import u06lab.solution._
 
 class TryParsers {
   def parser = new BasicParser(Set('a', 'b', 'c'))
@@ -11,7 +12,7 @@ class TryParsers {
   def parserNTC = new NotTwoConsecutiveParser(Set('X', 'Y', 'Z'))
   // note we do not need a class name here, we use the structural type
   def parserNTCNE = new BasicParser(Set('X', 'Y', 'Z')) with NotTwoConsecutive[Char] with NonEmpty[Char]
-  def sparser: Parser[Char] = ??? // "abc".charParser()
+  def sparser: Parser[Char] = new BasicParser(Set('a', 'b', 'c')) with NotTwoConsecutive[Char] with NonEmpty[Char] // "abc".charParser()
 
   @Test
   def testBasicParser = {
@@ -43,7 +44,7 @@ class TryParsers {
 
   @Test
   def testStringParser = {
-    assertTrue(sparser.parseAll("aabc".toList))
+    assertTrue(sparser.parseAll("abc".toList))
     assertFalse(sparser.parseAll("aabcdc".toList))
     assertTrue(sparser.parseAll("".toList))
   }
