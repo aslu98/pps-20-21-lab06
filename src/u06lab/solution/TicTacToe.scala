@@ -1,5 +1,7 @@
 package u06lab.solution
 
+import u06lab.solution.TicTacToe.{Mark, O, X, find, placeAnyMark, printBoards}
+
 object TicTacToe {
   sealed trait Player{
     def other: Player = this match {case X => O; case _ => X}
@@ -12,11 +14,16 @@ object TicTacToe {
   type Board = List[Mark]
   type Game = List[Board]
 
-  def find(board: Board, x: Int, y: Int): Option[Player] = ???
+  def find(board: Board, x: Int, y: Int): Option[Player] = board.filter(m => m.x==x && m.y == y) match {
+    case Nil => None
+    case board => Some(board.last.player)
+  }
+  def placeAnyMark(board: Board, player: Player): Seq[Board] = {
+    for {x <- 0 to 2; y <- 0 to 2
+         if !board.map(m => (m.x, m.y)).contains((x,y))} yield board.appended(Mark(x, y, player))
+  }
 
-  def placeAnyMark(board: Board, player: Player): Seq[Board] = ???
-
-  def computeAnyGame(player: Player, moves: Int): Stream[Game] = ???
+  def computeAnyGame(player: Player, moves: Int): LazyList[Game] = ???
 
   def printBoards(game: Seq[Board]): Unit =
     for (y <- 0 to 2; board <- game.reverse; x <- 0 to 2) {
@@ -31,6 +38,7 @@ object TicTacToe {
 
   // Exercise 2: implement placeAnyMark such that..
   printBoards(placeAnyMark(List(),X))
+  // -> Seq(Mark(0,0,X), Mark(0,1,X), Mark(0,2,X),...)
   //... ... ..X ... ... .X. ... ... X..
   //... ..X ... ... .X. ... ... X.. ...
   //..X ... ... .X. ... ... X.. ... ...
@@ -51,4 +59,22 @@ object TicTacToe {
   //... .X. .X. .X. .X.
 
   // Exercise 4 (VERY ADVANCED!) -- modify the above one so as to stop each game when someone won!!
+}
+
+object Test extends App {
+  // Exercise 1: implement find such that..
+  println(find(List(Mark(0,0,X)),0,0)) // Some(X)
+  println(find(List(Mark(0,0,X),Mark(0,1,O),Mark(0,2,X)),0,1)) // Some(O)
+  println(find(List(Mark(0,0,X),Mark(0,1,O),Mark(0,2,X)),1,1)) // None
+
+  // Exercise 2: implement placeAnyMark such that..
+  printBoards(placeAnyMark(List(),X))
+  // -> Seq(Mark(0,0,X), Mark(0,1,X), Mark(0,2,X),...)
+  //... ... ..X ... ... .X. ... ... X..
+  //... ..X ... ... .X. ... ... X.. ...
+  //..X ... ... .X. ... ... X.. ... ...
+  printBoards(placeAnyMark(List(Mark(0,0,O)),X))
+  //O.. O.. O.X O.. O.. OX. O.. O..
+  //... ..X ... ... .X. ... ... X..
+  //..X ... ... .X. ... ... X.. ...
 }
