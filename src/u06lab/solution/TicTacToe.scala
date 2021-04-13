@@ -24,7 +24,7 @@ object TicTacToe {
   }
 
   def computeAnyGame(player: Player, moves: Int): LazyList[Game] = moves match {
-    case 1 => placeAnyMark(List(),player).toList.flatMap(b => List(List(b))).to(LazyList)
+    case 1 => placeAnyMark(List(),player).map(b => List(b)).to(LazyList)
     case _ => for {
       game <- computeAnyGame(player.other, moves - 1)
       board <- placeAnyMark(game.head, player)
