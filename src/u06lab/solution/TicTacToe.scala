@@ -35,24 +35,24 @@ object TicTacToe {
          if find(board, x, y).isEmpty} yield board.appended(Mark(x, y, player))
   }
 
-  def computeAnyGame(player: Player, moves: Int): LazyList[Game] = moves match {
+  def computeAnyGame(player: Player, moves: Int, stopWins: Boolean): LazyList[Game] = moves match {
     case 1 => placeAnyMark(List(), player).map(b => List(b)).to(LazyList)
     case _ => for {
-      game <- computeAnyGame(player.other, moves - 1)
+      game <- computeAnyGame(player.other, moves - 1, stopWins)
       board <- placeAnyMark(game.head, player)
-      if someoneWon(board).isEmpty
+      if stopWins && someoneWon(board).isEmpty
     } yield board :: game
   }
 
   def someoneWon(board: Board): Option[Player] = {
     var player: Option[Player] = None
-    for (x <- 0 to 2; p <- List(X, O)) {
-      if (List(Mark(x, 0, p), Mark(x, 1, p), Mark(x, 2, p)).forall(board.contains) ||
-        List(Mark(0, x, p), Mark(1, x, p), Mark(2, x, p)).forall(board.contains)) {
-        player = Some(p)
-      }
-    }
     for (p <- List(X, O)) {
+      for (x <- 0 to 2) {
+        if (List(Mark(x, 0, p), Mark(x, 1, p), Mark(x, 2, p)).forall(board.contains) ||
+          List(Mark(0, x, p), Mark(1, x, p), Mark(2, x, p)).forall(board.contains)) {
+          player = Some(p)
+        }
+      }
       if (List(Mark(0, 0, p), Mark(1, 1, p), Mark(2, 2, p)).forall(board.contains) ||
         List(Mark(0, 2, p), Mark(1, 1, p), Mark(2, 0, p)).forall(board.contains)) {
         player = Some(p)
@@ -71,7 +71,7 @@ object TicTacToe {
   }
 }
 
-object Test extends App {
+object PlayTicTacToe extends App {
   // Exercise 1: implement find such that..
   println(find(List(Mark(0,0,X)),0,0)) // Some(X)
   println(find(List(Mark(0,0,X),Mark(0,1,O),Mark(0,2,X)),0,1)) // Some(O)
@@ -89,7 +89,7 @@ object Test extends App {
   //..X ... ... .X. ... ... X.. ...
 
   // Exercise 3 (ADVANCED!): implement computeAnyGame such that..
-  computeAnyGame(O, 5).zipWithIndex foreach {g => println("sol " + g._2); printBoards(g._1); println()}
+  computeAnyGame(O, 4, false).zipWithIndex foreach {g => println("sol " + g._2); printBoards(g._1); println()}
   //... X.. X.. X.. XO.
   //... ... O.. O.. O..
   //... ... ... X.. X..
@@ -100,8 +100,5 @@ object Test extends App {
   //... .X. .X. .X. .X.
 
   // Exercise 4 (VERY ADVANCED!) -- modify the above one so as to stop each game when someone won!!
-
-  println(someoneWon(List(Mark(0, 0, X), Mark(1, 1, X), Mark (2, 2, X))))
-  println(someoneWon(List(Mark(0, 0, X), Mark(1, 1, X), Mark (2, 2, X))).isEmpty)
-  println(someoneWon(List(Mark(0, 0, X), Mark(1, 1, X))).isEmpty)
+  computeAnyGame(O, 5, true).zipWithIndex foreach {g => println("sol " + g._2); printBoards(g._1); println()}
 }
