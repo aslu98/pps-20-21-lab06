@@ -25,7 +25,7 @@ object TicTacToe {
   type Board = List[Mark]
   type Game = List[Board]
 
-  def find(board: Board, x: Int, y: Int): Option[Player] = Some(board.last).filter(m => m.x == x && m.y == y).map(m => m.player)
+  def find(board: Board, x: Int, y: Int): Option[Player] = Option.when(board.exists(m => m.x == x && m.y == y))(board.last.player)
   
   def placeAnyMark(board: Board, player: Player): Seq[Board] = {
     for {x <- 0 to 2; y <- 0 to 2
